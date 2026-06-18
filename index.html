@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#15120F">
+<title>Boozle — Verified members. Shared drinks. Nobody drinks alone.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: #15120F;
+    --ink-soft: #1E1A15;
+    --ink-line: #36302A;
+    --cream: #EFE7D8;
+    --cream-dim: #DCD2BC;
+    --copper: #C17A3D;
+    --copper-deep: #8B5A2B;
+    --forest: #33533A;
+    --text-on-ink: #E9E2D4;
+    --text-on-ink-muted: #B6AB97;
+    --text-on-cream: #2A2520;
+    --danger-soft: #B5483E;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; overflow-x: hidden; width: 100%; }
+  body{
+    margin:0;
+    background: var(--ink);
+    color: var(--text-on-ink);
+    font-family: 'IBM Plex Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    width: 100%;
+  }
+  .wrap{ max-width: 1140px; margin: 0 auto; padding: 0 28px; }
+
+  a{ color: inherit; }
+  ::selection{ background: var(--copper); color: var(--ink); }
+
+  :focus-visible{
+    outline: 2px solid var(--copper);
+    outline-offset: 3px;
+  }
+
+  /* ---------- NAV ---------- */
+  nav.wrap{
+    display:flex; align-items:center; justify-content:space-between;
+    padding-top: 28px; padding-bottom: 28px;
+  }
+  .wordmark{
+    font-family:'Fraunces', serif; font-weight:600; font-size: 22px;
+    letter-spacing: 0.01em;
+  }
+  .wordmark span{ color: var(--copper); }
+  .nav-cta{
+    font-family:'IBM Plex Mono', monospace; font-size: 12.5px;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--ink); background: var(--copper);
+    padding: 10px 16px; border-radius: 2px; text-decoration:none;
+    border: 1px solid var(--copper);
+    transition: background .15s ease, color .15s ease;
+  }
+  .nav-cta:hover{ background: transparent; color: var(--copper); }
+
+  /* ---------- HERO ---------- */
+  .hero{ padding: 48px 0 84px; }
+  .hero-grid{
+    display:grid; grid-template-columns: 1.1fr 0.9fr; gap: 56px; align-items:center;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace; font-size: 12.5px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--copper); margin: 0 0 18px;
+  }
+  h1{
+    font-family:'Fraunces', serif; font-weight: 600; font-style: normal;
+    font-size: 52px; line-height: 1.06; letter-spacing: -0.01em;
+    margin: 0 0 22px; color: var(--text-on-ink);
+  }
+  h1 em{ font-style: italic; font-weight: 500; color: var(--copper); }
+  .sub{
+    font-size: 17px; line-height: 1.6; color: var(--text-on-ink-muted);
+    max-width: 480px; margin: 0 0 34px;
+  }
+
+  form.waitlist{
+    display:flex; gap: 10px; max-width: 460px; margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  form.waitlist input[type=email]{
+    flex: 1 1 240px;
+    background: var(--ink-soft);
+    border: 1px solid var(--ink-line);
+    color: var(--text-on-ink);
+    font-family:'IBM Plex Sans', sans-serif; font-size: 15px;
+    padding: 14px 16px; border-radius: 2px;
+  }
+  form.waitlist input[type=email]::placeholder{ color: #7D7464; }
+  form.waitlist button{
+    font-family:'IBM Plex Mono', monospace; font-size: 13px;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    background: var(--copper); color: var(--ink); border: 1px solid var(--copper);
+    padding: 14px 22px; border-radius: 2px; cursor:pointer;
+    transition: background .15s ease, color .15s ease;
+  }
+  form.waitlist button:hover{ background: transparent; color: var(--copper); }
+  .hidden-field{ position:absolute; left:-9999px; }
+
+  .fine{
+    font-family:'IBM Plex Mono', monospace; font-size: 12px;
+    color: var(--text-on-ink-muted); letter-spacing: 0.02em;
+    margin: 6px 0;
+  }
+  .fine b{ color: var(--text-on-ink); font-weight: 500; }
+
+  .form-msg{
+    font-family:'IBM Plex Mono', monospace; font-size: 12.5px;
+    color: var(--forest); margin: 6px 0 0; min-height: 16px;
+  }
+  .form-msg.error{ color: var(--danger-soft); }
+
+  /* ---------- MEMBERSHIP CARD (signature element) ---------- */
+  .card-stage{ display:flex; justify-content:center; }
+  .card{
+    width: 100%; max-width: 360px;
+    background: var(--cream);
+    border: 1px solid var(--copper-deep);
+    border-radius: 6px;
+    padding: 26px 26px 22px;
+    position: relative;
+    color: var(--text-on-cream);
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.55);
+    transform: rotate(-1.4deg);
+    overflow: hidden;
+  }
+  .card::before{
+    content:""; position:absolute; inset:0;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.025) 0px, rgba(0,0,0,0.025) 1px, transparent 1px, transparent 3px);
+    pointer-events:none;
+  }
+  .card-top{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    margin-bottom: 18px;
+  }
+  .card-label{
+    font-family:'IBM Plex Mono', monospace; font-size: 10.5px;
+    letter-spacing: 0.12em; text-transform: uppercase; color: #6B6354;
+  }
+  .card-no{
+    font-family:'IBM Plex Mono', monospace; font-size: 11px; color: #6B6354;
+  }
+  .card-name{
+    font-family:'Fraunces', serif; font-weight: 600; font-size: 26px;
+    margin: 0 0 4px;
+  }
+  .card-meta{
+    font-family:'IBM Plex Mono', monospace; font-size: 12px;
+    color: #4A443A; line-height: 1.9;
+  }
+  .card-meta strong{ color: var(--forest); }
+  .meta-row{ display:flex; justify-content: space-between; gap: 12px; }
+  .meta-row span:first-child{ color: #6B6354; }
+  .card-divider{
+    height:1px; background: rgba(0,0,0,0.12); margin: 16px 0;
+  }
+  .stamp{
+    position:absolute; top: 96px; right: 18px;
+    width: 118px; height: 118px;
+    border: 3px solid var(--forest);
+    border-radius: 50%;
+    color: var(--forest);
+    display:flex; align-items:center; justify-content:center;
+    transform: rotate(-18deg);
+    font-family:'IBM Plex Mono', monospace;
+    font-weight: 600; font-size: 13px; letter-spacing: 0.08em;
+    text-align:center; line-height: 1.3;
+    opacity: 0.92;
+  }
+  .stamp-inner{ padding: 6px; }
+
+  @media (prefers-reduced-motion: no-preference){
+    .card{ animation: settle .7s cubic-bezier(.2,.8,.2,1) both; }
+    .stamp{ animation: thud .5s .55s cubic-bezier(.2,.8,.3,1.4) both; }
+    @keyframes settle{
+      from{ opacity:0; transform: rotate(-1.4deg) translateY(18px); }
+      to{ opacity:1; transform: rotate(-1.4deg) translateY(0); }
+    }
+    @keyframes thud{
+      from{ opacity:0; transform: rotate(-34deg) scale(1.3); }
+      to{ opacity:0.92; transform: rotate(-18deg) scale(1); }
+    }
+  }
+
+  /* ---------- DIVIDER ---------- */
+  .hr{ height:1px; background: var(--ink-line); }
+
+  /* ---------- PULL QUOTE ---------- */
+  .quote-section{ padding: 76px 0; }
+  .quote{
+    font-family:'Fraunces', serif; font-style: italic; font-weight: 400;
+    font-size: 30px; line-height: 1.5; color: var(--cream-dim);
+    max-width: 700px; margin: 0;
+  }
+
+  /* ---------- HOW IT WORKS ---------- */
+  .steps-section{ padding: 0 0 76px; }
+  .section-head{
+    font-family:'IBM Plex Mono', monospace; font-size: 12.5px;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--copper);
+    margin: 0 0 36px;
+  }
+  .steps{
+    display:grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+    border-top: 1px solid var(--ink-line);
+  }
+  .step{
+    padding: 28px 28px 0 0; border-right: 1px solid var(--ink-line);
+  }
+  .step:last-child{ border-right:none; }
+  .step-no{
+    font-family:'IBM Plex Mono', monospace; font-size: 13px; color: var(--copper);
+    margin-bottom: 14px; display:block;
+  }
+  .step h3{
+    font-family:'Fraunces', serif; font-weight: 600; font-size: 21px;
+    margin: 0 0 10px;
+  }
+  .step p{
+    font-size: 14.5px; line-height: 1.6; color: var(--text-on-ink-muted);
+    margin: 0; max-width: 280px;
+  }
+
+  /* ---------- PROTECTIONS PLAQUE ---------- */
+  .plaque-section{ padding: 0 0 90px; }
+  .plaque{
+    background: linear-gradient(180deg, #2A2218, #1E1812);
+    border: 1px solid var(--copper-deep);
+    border-radius: 4px;
+    padding: 42px 44px;
+  }
+  .plaque-title{
+    font-family:'Fraunces', serif; font-weight: 600; font-size: 24px;
+    color: var(--copper); margin: 0 0 26px;
+    text-align:center; letter-spacing: 0.02em;
+  }
+  .rules{
+    list-style:none; margin:0; padding:0;
+    display:grid; grid-template-columns: 1fr 1fr; gap: 18px 40px;
+  }
+  .rules li{
+    font-family:'IBM Plex Mono', monospace; font-size: 13px;
+    letter-spacing: 0.03em; color: var(--text-on-ink);
+    padding-left: 20px; position:relative; line-height: 1.6;
+  }
+  .rules li::before{
+    content:"—"; position:absolute; left:0; color: var(--copper);
+  }
+
+  /* ---------- FOOTER CTA ---------- */
+  .footer-cta{ padding: 0 0 90px; text-align:center; }
+  .footer-cta h2{
+    font-family:'Fraunces', serif; font-weight: 600; font-size: 34px;
+    margin: 0 0 14px;
+  }
+  .footer-cta p{
+    color: var(--text-on-ink-muted); margin: 0 0 30px; font-size: 15px;
+  }
+  form.waitlist.center{ margin: 0 auto 10px; justify-content:center; }
+  .footer-cta .fine{ display:block; margin-top: 8px; }
+
+  footer{
+    border-top: 1px solid var(--ink-line);
+    padding: 26px 0 40px;
+    font-family:'IBM Plex Mono', monospace; font-size: 11.5px;
+    color: var(--text-on-ink-muted); text-align:center;
+  }
+
+  @media (max-width: 880px){
+    h1{ font-size: 38px; }
+    .hero-grid{ grid-template-columns: 1fr; gap: 48px; }
+    .card{ transform: none; max-width: 320px; }
+    .stamp{ top: 84px; right: 14px; width: 100px; height: 100px; font-size: 11.5px; }
+    .steps{ grid-template-columns: 1fr; }
+    .step{ border-right:none; border-bottom: 1px solid var(--ink-line); padding-bottom: 24px; margin-bottom: 4px; }
+    .rules{ grid-template-columns: 1fr; }
+    .plaque{ padding: 32px 24px; }
+    form.waitlist{ flex-direction: column; align-items: stretch; }
+    form.waitlist input[type=email], form.waitlist button{ width: 100%; }
+  }
+
+  @media (max-width: 480px){
+    .wrap{ padding: 0 20px; }
+    nav.wrap{ padding-top: 20px; padding-bottom: 20px; }
+    .wordmark{ font-size: 19px; }
+    .nav-cta{ font-size: 11px; padding: 9px 13px; }
+    .hero{ padding: 28px 0 56px; }
+    .eyebrow{ font-size: 11px; }
+    h1{ font-size: 30px; line-height: 1.12; }
+    .sub{ font-size: 15.5px; }
+    .card{ max-width: 100%; padding: 22px 20px 20px; }
+    .card-name{ font-size: 22px; }
+    .stamp{ top: 78px; right: 10px; width: 88px; height: 88px; font-size: 10.5px; }
+    .quote{ font-size: 23px; }
+    .quote-section{ padding: 52px 0; }
+    .steps-section{ padding: 0 0 52px; }
+    .plaque-section{ padding: 0 0 60px; }
+    .plaque-title{ font-size: 20px; }
+    .rules li{ font-size: 12.5px; }
+    .footer-cta{ padding: 0 0 60px; }
+    .footer-cta h2{ font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="wrap">
+  <div class="wordmark">booz<span>l</span>e</div>
+  <a class="nav-cta" href="#join">Get on the list</a>
+</nav>
+
+<section class="hero wrap">
+  <div class="hero-grid">
+    <div>
+      <p class="eyebrow">Now signing up members — Delhi NCR</p>
+      <h1>Drink in good<br>company. <em>Verified</em><br>company.</h1>
+      <p class="sub">Boozle matches you with someone who also doesn't want to drink alone tonight — every member ID-verified, 25+, with safety built into the meetup itself, not bolted on after.</p>
+
+      <form class="waitlist" id="waitlist-form" name="waitlist" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+        <input type="hidden" name="form-name" value="waitlist">
+        <p class="hidden-field"><label>Don't fill this out: <input name="bot-field"></label></p>
+        <input type="email" name="email" placeholder="you@email.com" required aria-label="Email address">
+        <button type="submit">Join waitlist</button>
+      </form>
+      <p class="form-msg" id="form-msg" role="status"></p>
+      <p class="fine"><b>25+ only.</b> ID verification required to match. Boozle does not sell, deliver, or serve alcohol.</p>
+      <p class="fine">Your email is stored securely and used only to notify you at launch — handled in line with India's data protection rules under the DPDP Act, 2023. No spam, never shared.</p>
+    </div>
+
+    <div class="card-stage">
+      <div class="card" aria-hidden="true">
+        <div class="card-top">
+          <span class="card-label">Boozle Member</span>
+          <span class="card-no">No. 000142</span>
+        </div>
+        <p class="card-name">Member Card</p>
+        <p class="card-meta">
+          <span class="meta-row"><span>AGE VERIFIED</span><strong>25+</strong></span>
+          <span class="meta-row"><span>STATUS</span><strong>On the list</strong></span>
+          <span class="meta-row"><span>CITY</span><span>Delhi NCR</span></span>
+        </p>
+        <div class="card-divider"></div>
+        <p class="card-meta">Messaging: you choose who reaches out first.<br>Every meetup: live check-in + one-tap SOS.</p>
+        <div class="stamp"><span class="stamp-inner">VERIFIED<br>MEMBER</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="hr wrap" style="margin:0 28px;"></div>
+
+<section class="quote-section wrap">
+  <p class="quote">"Drinking alone tonight" shouldn't be the only option, and "drinking with a stranger" shouldn't mean an unsafe one. Boozle exists for the gap in between.</p>
+</section>
+
+<section class="steps-section wrap">
+  <p class="section-head">How it works</p>
+  <div class="steps">
+    <div class="step">
+      <span class="step-no">01</span>
+      <h3>Verify</h3>
+      <p>A quick ID check confirms you're 25+. No document is stored on Boozle's side — just a verified badge on your profile.</p>
+    </div>
+    <div class="step">
+      <span class="step-no">02</span>
+      <h3>Match</h3>
+      <p>Find someone nearby who's also looking for company tonight. You decide who can message you first.</p>
+    </div>
+    <div class="step">
+      <span class="step-no">03</span>
+      <h3>Meet safe</h3>
+      <p>Public venue, live location check-in with a trusted contact, and an SOS button that's always one tap away.</p>
+    </div>
+  </div>
+</section>
+
+<section class="plaque-section wrap">
+  <div class="plaque">
+    <p class="plaque-title">Member Protections</p>
+    <ul class="rules">
+      <li>Every member ID-verified, 25+ only — no exceptions</li>
+      <li>You decide who can message you first</li>
+      <li>Live check-in shared with a trusted contact, every meetup</li>
+      <li>One-tap SOS, always on, surfaces emergency numbers instantly</li>
+      <li>Repeat offenders banned permanently — tied to verified identity, not just an account</li>
+      <li>Records released to police only on a formal request, never shared on our own judgment</li>
+    </ul>
+  </div>
+</section>
+
+<section class="footer-cta wrap" id="join">
+  <h2>Be first on the list.</h2>
+  <p>We're building member verification and safety tooling before opening matching to anyone. Leave your email and we'll let you know the moment Boozle is ready in Delhi NCR.</p>
+  <form class="waitlist center" id="waitlist-form-2" name="waitlist" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+    <input type="hidden" name="form-name" value="waitlist">
+    <p class="hidden-field"><label>Don't fill this out: <input name="bot-field"></label></p>
+    <input type="email" name="email" placeholder="you@email.com" required aria-label="Email address">
+    <button type="submit">Join waitlist</button>
+  </form>
+  <p class="form-msg" id="form-msg-2" role="status"></p>
+  <span class="fine">No spam. One email when we launch verification in your city. Stored securely, in line with India's data protection rules under the DPDP Act, 2023.</span>
+</section>
+
+<footer class="wrap">
+  Boozle is a concept in early validation. 25+ only. ID verification required to use the platform. No alcohol is sold, delivered, or served through Boozle. Email addresses collected here are stored only to notify signups at launch and are handled in line with India's data protection rules under the DPDP Act, 2023.
+</footer>
+
+<script>
+  // Netlify Forms AJAX submission pattern — works once this page is deployed
+  // on Netlify with Forms enabled (data-netlify="true" is auto-detected at deploy time).
+  function encode(formEl) {
+    return new URLSearchParams(new FormData(formEl)).toString();
+  }
+
+  function wireForm(formId, msgId) {
+    var form = document.getElementById(formId);
+    var msg = document.getElementById(msgId);
+    if (!form) return;
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var emailInput = form.querySelector('input[type=email]');
+      if (!emailInput.checkValidity()) {
+        msg.textContent = 'That email doesn\'t look right — double check it.';
+        msg.classList.add('error');
+        return;
+      }
+
+      fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: encode(form)
+      })
+        .then(function () {
+          msg.classList.remove('error');
+          msg.textContent = 'You\'re on the list — we\'ll email you when Boozle opens.';
+          form.reset();
+        })
+        .catch(function () {
+          msg.classList.remove('error');
+          msg.classList.add('error');
+          msg.textContent = 'Couldn\'t reach the server. Try again in a moment.';
+        });
+    });
+  }
+
+  wireForm('waitlist-form', 'form-msg');
+  wireForm('waitlist-form-2', 'form-msg-2');
+</script>
+
+</body>
+</html>
