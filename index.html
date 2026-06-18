@@ -107,7 +107,6 @@
     transition: background .15s ease, color .15s ease;
   }
   form.waitlist button:hover{ background: transparent; color: var(--copper); }
-  .hidden-field{ position:absolute; left:-9999px; }
 
   .fine{
     font-family:'IBM Plex Mono', monospace; font-size: 12px;
@@ -161,8 +160,8 @@
     color: #4A443A; line-height: 1.9;
   }
   .card-meta strong{ color: var(--forest); }
-  .meta-row{ display:flex; justify-content: space-between; gap: 12px; }
-  .meta-row span:first-child{ color: #6B6354; }
+  .meta-row{ display:flex; justify-content: flex-start; gap: 8px; }
+  .meta-row span:first-child{ color: #6B6354; min-width: 100px; white-space: nowrap; }
   .card-divider{
     height:1px; background: rgba(0,0,0,0.12); margin: 16px 0;
   }
@@ -303,6 +302,7 @@
     .card{ max-width: 100%; padding: 22px 20px 20px; }
     .card-name{ font-size: 22px; }
     .stamp{ top: 78px; right: 10px; width: 88px; height: 88px; font-size: 10.5px; }
+    .meta-row span:first-child{ min-width: 80px; }
     .quote{ font-size: 23px; }
     .quote-section{ padding: 52px 0; }
     .steps-section{ padding: 0 0 52px; }
@@ -328,9 +328,9 @@
       <h1>Drink in good<br>company. <em>Verified</em><br>company.</h1>
       <p class="sub">Alcoholers matches you with someone who also doesn't want to drink alone tonight — every member ID-verified, 25+, with safety built into the meetup itself, not bolted on after.</p>
 
-      <form class="waitlist" id="waitlist-form" name="waitlist" method="POST" data-netlify="true" netlify-honeypot="bot-field">
-        <input type="hidden" name="form-name" value="waitlist">
-        <p class="hidden-field"><label>Don't fill this out: <input name="bot-field"></label></p>
+      <form class="waitlist" id="waitlist-form">
+        <input type="hidden" name="access_key" value="PASTE_YOUR_WEB3FORMS_ACCESS_KEY_HERE">
+        <input type="hidden" name="subject" value="New Alcoholers waitlist signup">
         <input type="email" name="email" placeholder="you@email.com" required aria-label="Email address">
         <button type="submit">Join waitlist</button>
       </form>
@@ -371,7 +371,7 @@
     <div class="step">
       <span class="step-no">01</span>
       <h3>Verify</h3>
-      <p>A quick ID check confirms you're 25+. No document is stored on Alcoholers's side — just a verified badge on your profile.</p>
+      <p>A quick ID check confirms you're 25+. No document is stored on Alcoholers' side — just a verified badge on your profile.</p>
     </div>
     <div class="step">
       <span class="step-no">02</span>
@@ -403,9 +403,9 @@
 <section class="footer-cta wrap" id="join">
   <h2>Be first on the list.</h2>
   <p>We're building member verification and safety tooling before opening matching to anyone. Leave your email and we'll let you know the moment Alcoholers is ready in Delhi NCR.</p>
-  <form class="waitlist center" id="waitlist-form-2" name="waitlist" method="POST" data-netlify="true" netlify-honeypot="bot-field">
-    <input type="hidden" name="form-name" value="waitlist">
-    <p class="hidden-field"><label>Don't fill this out: <input name="bot-field"></label></p>
+  <form class="waitlist center" id="waitlist-form-2">
+    <input type="hidden" name="access_key" value="PASTE_YOUR_WEB3FORMS_ACCESS_KEY_HERE">
+    <input type="hidden" name="subject" value="New Alcoholers waitlist signup">
     <input type="email" name="email" placeholder="you@email.com" required aria-label="Email address">
     <button type="submit">Join waitlist</button>
   </form>
@@ -418,12 +418,10 @@
 </footer>
 
 <script>
-  // Netlify Forms AJAX submission pattern — works once this page is deployed
-  // on Netlify with Forms enabled (data-netlify="true" is auto-detected at deploy time).
-  function encode(formEl) {
-    return new URLSearchParams(new FormData(formEl)).toString();
-  }
-
+  // Web3Forms submission — works on any static host, including GitHub Pages.
+  // Get a free access key at https://web3forms.com (no signup friction, just
+  // an email + verification) and paste it into both hidden "access_key"
+  // fields above before this will actually deliver emails to you.
   function wireForm(formId, msgId) {
     var form = document.getElementById(formId);
     var msg = document.getElementById(msgId);
@@ -438,18 +436,27 @@
         return;
       }
 
-      fetch('/', {
+      var payload = Object.fromEntries(new FormData(form));
+
+      fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: encode(form)
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
       })
-        .then(function () {
+        .then(function (res) {
+          return res.json().then(function (data) { return { ok: res.ok, data: data }; });
+        })
+        .then(function (result) {
           msg.classList.remove('error');
-          msg.textContent = 'You\'re on the list — we\'ll email you when Alcoholers opens.';
-          form.reset();
+          if (result.ok) {
+            msg.textContent = 'You\'re on the list — we\'ll email you when Alcoholers opens.';
+            form.reset();
+          } else {
+            msg.classList.add('error');
+            msg.textContent = (result.data && result.data.message) || 'Something went wrong — try again.';
+          }
         })
         .catch(function () {
-          msg.classList.remove('error');
           msg.classList.add('error');
           msg.textContent = 'Couldn\'t reach the server. Try again in a moment.';
         });
